@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { TextField, Button, Select, MenuItem, FormControl, InputLabel, List, ListItem, ListItemText } from '@mui/material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const mockCourses = [
   { id: 1, name: 'Curso de Elétrica de automóveis', type: 'aperfeicoamento', details: 'Detalhes do curso de Elétrica de automóveis' },
-  { id: 2, name: 'Curso de Elétrica geral', type: 'iniciacao', details: 'Detalhes do curso de Elétrica geral' },
-  { id: 3, name: 'Curso de Elétrica de motos', type: 'especializacao', details: 'Detalhes do curso de Elétrica de motos' },
+  { id: 2, name: 'Curso de Elétrica geral', type: 'aperfeicoamento', details: 'Detalhes do curso de Elétrica geral' },
+  { id: 3, name: 'Curso de Elétrica de motos', type: 'especialização', details: 'Detalhes do curso de Elétrica de motos' },
   { id: 4, name: 'Curso de React', type: 'aperfeicoamento', details: 'Detalhes do curso de React' },
   { id: 5, name: 'Curso de JavaScript', type: 'iniciacao', details: 'Detalhes do curso de JavaScript' },
   { id: 6, name: 'Curso de Phyton', type: 'aperfeicoamento', details: 'Detalhes do curso de Phyton' },
-  { id: 7, name: 'Curso de C#', type: 'especializacao', details: 'Detalhes do curso de C#' },
 ];
 
 const CourseForm = () => {
@@ -45,21 +46,22 @@ const CourseForm = () => {
   };
 
   const handleSuggestionClick = (course) => {
-    setCourseName(course.name);
     setCourseData(course);
+    setCourseName(course.name);
     setSuggestions([]);
+    toast.info('O nome do novo curso deve ser diferente do original.');
   };
 
   const handleSave = () => {
+    if (courseName === courseData?.name) {
+      toast.error('O nome do novo curso deve ser diferente do original.');
+      return;
+    }
+    
     const newCourseData = { name: courseName, type: courseType, details: courseData?.details || '' };
     localStorage.setItem('courseData', JSON.stringify(newCourseData));
     setCourseData(newCourseData);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && suggestions.length === 0) {
-      setCourseData({ name: courseName, type: courseType, details: '' });
-    }
+    toast.success('Curso salvo com sucesso!');
   };
 
   return (
@@ -77,14 +79,17 @@ const CourseForm = () => {
           <MenuItem value="especializacao">Especialização Profissional</MenuItem>
         </Select>
       </FormControl>
-      <TextField
-        fullWidth
-        margin="normal"
-        label="Nome do Curso"
-        value={courseName}
-        onChange={handleCourseNameChange}
-        onKeyDown={handleKeyDown}
-      />
+      
+      {courseType && (
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Nome do Curso"
+          value={courseName}
+          onChange={handleCourseNameChange}
+        />
+      )}
+      
       {suggestions.length > 0 && (
         <List>
           {suggestions.map((course) => (
@@ -94,34 +99,24 @@ const CourseForm = () => {
           ))}
         </List>
       )}
-      {courseData && (
+      
+      {courseType && courseName && (
         <div style={{ marginTop: '20px' }}>
           <TextField
             fullWidth
             margin="normal"
-            label="Nome"
-            value={courseData.name}
-            onChange={(e) => setCourseData({ ...courseData, name: e.target.value })}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Tipo"
-            value={courseData.type}
-            disabled
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Detalhes"
-            value={courseData.details}
+            label="Detalhes do Curso"
+            value={courseData?.details || ''}
             onChange={(e) => setCourseData({ ...courseData, details: e.target.value })}
           />
         </div>
       )}
+      
       <Button variant="contained" color="primary" onClick={handleSave} style={{ marginTop: '20px' }}>
         Salvar
       </Button>
+      
+      <ToastContainer />
     </div>
   );
 };
