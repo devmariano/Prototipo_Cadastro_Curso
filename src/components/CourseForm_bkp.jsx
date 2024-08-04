@@ -24,9 +24,8 @@ import { ExpandMore } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import mockCourses from '../data/mockCourses';
-import { jsPDF } from 'jspdf';
 
-const steps = ['Definição do Curso', 'Detalhes do Curso', 'Perfil Profissional', 'Resumo do curso'];
+const steps = ['Definição do Curso', 'Detalhes do Curso', 'Perfil Profissional'];
 
 const CourseForm = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -392,67 +391,9 @@ const CourseForm = () => {
             />
           </div>
         );
-        case 3:
-          return (
-            <div>
-              {/* <Typography variant="h6">Resumo do Curso</Typography> */}
-              <Typography>Nome do Curso: {courseName}</Typography>
-              <Typography>Tipo de Curso: {courseType}</Typography>
-              <Typography>Objetivo do Curso: {courseData.details}</Typography>
-              <Typography>Data Inicial de Vigência: {courseData.startDate}</Typography>
-              <Typography>Data Final de Vigência: {courseData.endDate}</Typography>
-              <Typography>Número Máximo de Alunos: {courseData.maxStudents}</Typography>
-              <Typography>Número Mínimo de Alunos: {courseData.minStudents}</Typography>
-              <Typography>Nível de Escolaridade: {courseData.educationLevel}</Typography>
-              <Typography>Idade Mínima: {courseData.minAge}</Typography>
-              <Typography>Idade Máxima: {courseData.maxAge}</Typography>
-              <Typography>Outros Requisitos:</Typography>
-              <ul>
-                {courseData.otherRequirements.map((req, index) => (
-                  <li key={index}>{req}</li>
-                ))}
-              </ul>
-              <Typography>Eixo Tecnológico: {courseData.technologicalAxis}</Typography>
-              <Typography>Área Tecnológica: {courseData.technologicalArea}</Typography>
-              <Typography>Segmento Tecnológico: {courseData.technologicalSegment}</Typography>
-              <Typography>CBO: {courseData.cbo}</Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ marginTop: '20px' }}
-                onClick={downloadPDF}
-              >
-                Baixar PDF
-              </Button>
-            </div>
-          );
       default:
         return 'Passo desconhecido';
     }
-  };
-
-  const downloadPDF = () => {
-    const doc = new jsPDF();
-    doc.text('Resumo do Curso', 10, 10);
-    doc.text(`Nome do Curso: ${courseName}`, 10, 20);
-    doc.text(`Tipo de Curso: ${courseType}`, 10, 30);
-    doc.text(`Objetivo do Curso: ${courseData.details}`, 10, 40);
-    doc.text(`Data Inicial de Vigência: ${courseData.startDate}`, 10, 50);
-    doc.text(`Data Final de Vigência: ${courseData.endDate}`, 10, 60);
-    doc.text(`Número Máximo de Alunos: ${courseData.maxStudents}`, 10, 70);
-    doc.text(`Número Mínimo de Alunos: ${courseData.minStudents}`, 10, 80);
-    doc.text(`Nível de Escolaridade: ${courseData.educationLevel}`, 10, 90);
-    doc.text(`Idade Mínima: ${courseData.minAge}`, 10, 100);
-    doc.text(`Idade Máxima: ${courseData.maxAge}`, 10, 110);
-    doc.text('Outros Requisitos:', 10, 120);
-    courseData.otherRequirements.forEach((req, index) => {
-      doc.text(`- ${req}`, 10, 130 + index * 10);
-    });
-    doc.text(`Eixo Tecnológico: ${courseData.technologicalAxis}`, 10, 140 + courseData.otherRequirements.length * 10);
-    doc.text(`Área Tecnológica: ${courseData.technologicalArea}`, 10, 150 + courseData.otherRequirements.length * 10);
-    doc.text(`Segmento Tecnológico: ${courseData.technologicalSegment}`, 10, 160 + courseData.otherRequirements.length * 10);
-    doc.text(`CBO: ${courseData.cbo}`, 10, 170 + courseData.otherRequirements.length * 10);
-    doc.save('Resumo_Curso.pdf');
   };
 
   return (

@@ -15,16 +15,12 @@ import {
   StepLabel,
   Stepper,
   TextField,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Typography
 } from '@mui/material';
-import { ExpandMore } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import mockCourses from '../data/mockCourses';
 import { jsPDF } from 'jspdf';
+import mockCourses from '../data/mockCourses';
 
 const steps = ['Definição do Curso', 'Detalhes do Curso', 'Perfil Profissional', 'Resumo do curso'];
 
@@ -49,7 +45,6 @@ const CourseForm = () => {
   });
   const [suggestions, setSuggestions] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [expanded, setExpanded] = useState('panel0');
   const [isNameValid, setIsNameValid] = useState(true);
 
   useEffect(() => {
@@ -60,9 +55,6 @@ const CourseForm = () => {
     }
   }, [courseName, courseType]);
 
-  const handleAccordionChange = (panel) => (event, newExpanded) => {
-    setExpanded(newExpanded ? panel : false);
-  };
 
   const handleNext = () => {
     if (!isNameValid) {
@@ -70,17 +62,14 @@ const CourseForm = () => {
       return;
     }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setExpanded(`panel${activeStep + 1}`);
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    setExpanded(`panel${activeStep - 1}`);
   };
 
   const handleReset = () => {
     setActiveStep(0);
-    setExpanded('panel0');
     setCourseType('');
     setCourseName('');
     setCourseData({
@@ -233,7 +222,6 @@ const CourseForm = () => {
                 onChange={handleCourseNameChange}
                 error={!isNameValid}
                 helperText={!isNameValid && 'O nome do novo curso deve ser diferente do original.'}
-                //sx={{ borderColor: !isNameValid ? 'red' : 'initial', borderWidth: '1px', borderStyle: 'solid' }}
               />
             )}
             {suggestions.length > 0 && (
@@ -285,40 +273,32 @@ const CourseForm = () => {
             <TextField
               fullWidth
               margin="normal"
-              label="Nº Máximo de Alunos por Turma"
+              label="Número Máximo de Alunos"
               type="number"
-              inputProps={{ min: courseData.minStudents }}
               value={courseData.maxStudents}
               onChange={(e) => setCourseData({ ...courseData, maxStudents: e.target.value })}
             />
             <TextField
               fullWidth
               margin="normal"
-              label="Nº Mínimo de Alunos por Turma"
+              label="Número Mínimo de Alunos"
               type="number"
-              inputProps={{ max: courseData.maxStudents }}
               value={courseData.minStudents}
               onChange={(e) => setCourseData({ ...courseData, minStudents: e.target.value })}
             />
             <FormControl fullWidth margin="normal">
-              <InputLabel id="education-level-label">Escolaridade</InputLabel>
+              <InputLabel id="education-level-label">Nível de Escolaridade</InputLabel>
               <Select
                 labelId="education-level-label"
                 value={courseData.educationLevel}
                 onChange={(e) => setCourseData({ ...courseData, educationLevel: e.target.value })}
               >
                 <MenuItem value="">
-                  <em>Selecione a escolaridade mínima</em>
+                  <em>Selecione o nível de escolaridade</em>
                 </MenuItem>
-                <MenuItem value="Ensino Fundamental Incompleto">Ensino Fundamental Incompleto</MenuItem>
-                <MenuItem value="Ensino Fundamental Completo">Ensino Fundamental Completo</MenuItem>
-                <MenuItem value="Ensino Médio Incompleto">Ensino Médio Incompleto</MenuItem>
-                <MenuItem value="Ensino Médio Completo">Ensino Médio Completo</MenuItem>
-                <MenuItem value="Ensino Técnico">Ensino Técnico</MenuItem>
-                <MenuItem value="Graduação">Graduação</MenuItem>
-                <MenuItem value="Pós-graduação">Pós-graduação</MenuItem>
-                <MenuItem value="Mestrado">Mestrado</MenuItem>
-                <MenuItem value="Doutorado">Doutorado</MenuItem>
+                <MenuItem value="fundamental">Fundamental</MenuItem>
+                <MenuItem value="medio">Médio</MenuItem>
+                <MenuItem value="tecnico">Técnico</MenuItem>
               </Select>
             </FormControl>
             <TextField
@@ -326,7 +306,6 @@ const CourseForm = () => {
               margin="normal"
               label="Idade Mínima"
               type="number"
-              inputProps={{ min: courseData.minAge }}
               value={courseData.minAge}
               onChange={(e) => setCourseData({ ...courseData, minAge: e.target.value })}
             />
@@ -335,26 +314,24 @@ const CourseForm = () => {
               margin="normal"
               label="Idade Máxima"
               type="number"
-              inputProps={{ max: courseData.maxAge }}
               value={courseData.maxAge}
               onChange={(e) => setCourseData({ ...courseData, maxAge: e.target.value })}
             />
-            <Typography variant="h6" gutterBottom>
-              Outros Requisitos
-            </Typography>
-            {courseData.otherRequirements.map((req, index) => (
-              <TextField
-                key={index}
-                fullWidth
-                margin="normal"
-                label={`Requisito Adicional ${index + 1}`}
-                value={req}
-                onChange={(e) => handleRequirementChange(index, e.target.value)}
-              />
-            ))}
+            <Box mt={2}>
+              <Typography>Outros Requisitos:</Typography>
+              {courseData.otherRequirements.map((req, index) => (
+                <TextField
+                  key={index}
+                  fullWidth
+                  margin="normal"
+                  value={req}
+                  onChange={(e) => handleRequirementChange(index, e.target.value)}
+                />
+              ))}
             <Button onClick={addOtherRequirement} style={{ marginTop: '10px', backgroundColor: 'white', color: '#1976d2', border: '1px solid #1976d2'}}>
               Adicionar Requisito
             </Button>
+            </Box>
           </div>
         );
       case 2:
@@ -366,7 +343,6 @@ const CourseForm = () => {
               label="Eixo Tecnológico"
               value={courseData.technologicalAxis}
               onChange={(e) => setCourseData({ ...courseData, technologicalAxis: e.target.value })}
-              disabled
             />
             <TextField
               fullWidth
@@ -374,60 +350,59 @@ const CourseForm = () => {
               label="Área Tecnológica"
               value={courseData.technologicalArea}
               onChange={(e) => setCourseData({ ...courseData, technologicalArea: e.target.value })}
-              disabled
             />
             <TextField
               fullWidth
               margin="normal"
-              label="Segmento de Área Tecnológica"
+              label="Segmento Tecnológico"
               value={courseData.technologicalSegment}
               onChange={(e) => setCourseData({ ...courseData, technologicalSegment: e.target.value })}
             />
             <TextField
               fullWidth
               margin="normal"
-              label="CBO (Código Brasileiro de Ocupações)"
+              label="CBO"
               value={courseData.cbo}
               onChange={(e) => setCourseData({ ...courseData, cbo: e.target.value })}
             />
           </div>
         );
-        case 3:
-          return (
-            <div>
-              {/* <Typography variant="h6">Resumo do Curso</Typography> */}
-              <Typography>Nome do Curso: {courseName}</Typography>
-              <Typography>Tipo de Curso: {courseType}</Typography>
-              <Typography>Objetivo do Curso: {courseData.details}</Typography>
-              <Typography>Data Inicial de Vigência: {courseData.startDate}</Typography>
-              <Typography>Data Final de Vigência: {courseData.endDate}</Typography>
-              <Typography>Número Máximo de Alunos: {courseData.maxStudents}</Typography>
-              <Typography>Número Mínimo de Alunos: {courseData.minStudents}</Typography>
-              <Typography>Nível de Escolaridade: {courseData.educationLevel}</Typography>
-              <Typography>Idade Mínima: {courseData.minAge}</Typography>
-              <Typography>Idade Máxima: {courseData.maxAge}</Typography>
-              <Typography>Outros Requisitos:</Typography>
-              <ul>
-                {courseData.otherRequirements.map((req, index) => (
-                  <li key={index}>{req}</li>
-                ))}
-              </ul>
-              <Typography>Eixo Tecnológico: {courseData.technologicalAxis}</Typography>
-              <Typography>Área Tecnológica: {courseData.technologicalArea}</Typography>
-              <Typography>Segmento Tecnológico: {courseData.technologicalSegment}</Typography>
-              <Typography>CBO: {courseData.cbo}</Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ marginTop: '20px' }}
-                onClick={downloadPDF}
-              >
-                Baixar PDF
-              </Button>
-            </div>
-          );
+      case 3:
+        return (
+          <div>
+            <Typography variant="h6">Resumo do Curso</Typography>
+            <Typography>Nome do Curso: {courseName}</Typography>
+            <Typography>Tipo de Curso: {courseType}</Typography>
+            <Typography>Objetivo do Curso: {courseData.details}</Typography>
+            <Typography>Data Inicial de Vigência: {courseData.startDate}</Typography>
+            <Typography>Data Final de Vigência: {courseData.endDate}</Typography>
+            <Typography>Número Máximo de Alunos: {courseData.maxStudents}</Typography>
+            <Typography>Número Mínimo de Alunos: {courseData.minStudents}</Typography>
+            <Typography>Nível de Escolaridade: {courseData.educationLevel}</Typography>
+            <Typography>Idade Mínima: {courseData.minAge}</Typography>
+            <Typography>Idade Máxima: {courseData.maxAge}</Typography>
+            <Typography>Outros Requisitos:</Typography>
+            <ul>
+              {courseData.otherRequirements.map((req, index) => (
+                <li key={index}>{req}</li>
+              ))}
+            </ul>
+            <Typography>Eixo Tecnológico: {courseData.technologicalAxis}</Typography>
+            <Typography>Área Tecnológica: {courseData.technologicalArea}</Typography>
+            <Typography>Segmento Tecnológico: {courseData.technologicalSegment}</Typography>
+            <Typography>CBO: {courseData.cbo}</Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ marginTop: '20px' }}
+              onClick={downloadPDF}
+            >
+              Baixar PDF
+            </Button>
+          </div>
+        );
       default:
-        return 'Passo desconhecido';
+        return 'Unknown step';
     }
   };
 
@@ -456,54 +431,56 @@ const CourseForm = () => {
   };
 
   return (
-    <Box>
-      <Stepper activeStep={activeStep} orientation="vertical" nonLinear>
+    <Box sx={{ width: '100%' }}>
+      <Stepper activeStep={activeStep} orientation="vertical">
         {steps.map((label, index) => (
-          <Step key={label} expanded={expanded === `panel${index}`}>
+          <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-              <Accordion expanded={expanded === `panel${index}`} onChange={handleAccordionChange(`panel${index}`)}>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Typography>{label}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {renderStepContent(index)}
-                  {expanded === `panel${index}` && (
-                    <Box sx={{ mt: 2 }}>
-                      {activeStep !== 0 && (
-                        <Button onClick={handleBack} sx={{ mr: 1 }}>
-                          Voltar
-                        </Button>
-                      )}
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={index === steps.length - 1 ? handleSave : handleNext}
-                      >
-                        {index === steps.length - 1 ? 'Salvar' : 'Avançar'}
-                      </Button>
-                    </Box>
-                  )}
-                </AccordionDetails>
-              </Accordion>
+              {renderStepContent(index)}
+              <Box sx={{ mb: 2 }}>
+                <div>
+                  <Button
+                    variant="contained"
+                    onClick={index === steps.length - 1 ? handleSave : handleNext}
+                    sx={{ mt: 1, mr: 1 }}
+                  >
+                    {index === steps.length - 1 ? 'Finalizar' : 'Próximo'}
+                  </Button>
+                  <Button
+                    disabled={index === 0}
+                    onClick={handleBack}
+                    sx={{ mt: 1, mr: 1 }}
+                  >
+                    Voltar
+                  </Button>
+                </div>
+              </Box>
             </StepContent>
           </Step>
         ))}
       </Stepper>
       {activeStep === steps.length && (
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Curso cadastrado com sucesso!
-          </Typography>
-          <Button onClick={handleReset}>Cadastrar Novo Curso</Button>
+        <Box sx={{ p: 3 }}>
+          <Typography>Curso salvo com sucesso!</Typography>
+          <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
+            Redefinir
+          </Button>
         </Box>
       )}
-      <Modal open={openModal} onClose={handleCloseModal}>
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
         <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2">
+          <Typography id="modal-title" variant="h6" component="h2">
             Decreto Federal nº 5154/04 e Lei Federal nº 9394/96
           </Typography>
-          <Typography sx={{ mt: 2 }}>Texto do decreto e da lei aqui.</Typography>
+          <Typography id="modal-description" sx={{ mt: 2 }}>
+            Decreto Federal nº 5154/04 e Lei Federal nº 9394/96 se referem às normas e diretrizes para a educação profissional e técnica no Brasil, estabelecendo parâmetros para a criação, organização e oferta de cursos técnicos e profissionais.
+          </Typography>
         </Box>
       </Modal>
     </Box>
