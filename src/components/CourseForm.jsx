@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import { TextField, Button, Select, MenuItem, FormControl, InputLabel, List, ListItem, ListItemText } from '@mui/material';
-import { ToastContainer, toast } from 'react-toastify';
+import PropTypes from 'prop-types';
+import { TextField, Button, FormControl, InputLabel, Select, MenuItem, List, ListItem, ListItemText } from '@mui/material';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import mockCourses from '../data/mockCourses';
 
-const CourseForm = () => {
-  const [courseType, setCourseType] = useState('');
-  const [courseName, setCourseName] = useState('');
-  const [courseData, setCourseData] = useState(null);
+const CourseForm = ({ courseType, setCourseType, courseName, setCourseName, setCourseData, courseData, handleNext }) => {
   const [suggestions, setSuggestions] = useState([]);
+  const [isNameValid, setIsNameValid] = useState(true);
 
   useEffect(() => {
-    const savedCourseData = localStorage.getItem('courseData');
-    if (savedCourseData) {
-      setCourseData(JSON.parse(savedCourseData));
+    if (courseName && courseData && courseName === courseData.name) {
+      setIsNameValid(false);
+    } else {
+      setIsNameValid(true);
     }
-  }, []);
+  }, [courseName, courseData]);
 
   const handleCourseTypeChange = (e) => {
     setCourseType(e.target.value);
@@ -47,6 +47,7 @@ const CourseForm = () => {
   const handleSave = () => {
     if (courseName === courseData?.name) {
       toast.error('O nome do novo curso deve ser diferente do original.');
+      setIsNameValid(false);
       return;
     }
     
@@ -54,6 +55,7 @@ const CourseForm = () => {
     localStorage.setItem('courseData', JSON.stringify(newCourseData));
     setCourseData(newCourseData);
     toast.success('Curso salvo com sucesso!');
+    handleNext();
   };
 
   return (
@@ -79,6 +81,9 @@ const CourseForm = () => {
           label="Nome do Curso"
           value={courseName}
           onChange={handleCourseNameChange}
+          error={!isNameValid}
+          helperText={!isNameValid && "O nome do novo curso deve ser diferente do original."}
+          style={{ borderColor: isNameValid ? 'initial' : 'red' }}
         />
       )}
       
@@ -107,10 +112,18 @@ const CourseForm = () => {
       <Button variant="contained" color="primary" onClick={handleSave} style={{ marginTop: '20px' }}>
         Salvar
       </Button>
-      
-      <ToastContainer />
     </div>
   );
+};
+
+CourseForm.propTypes = {
+  courseType: PropTypes.string.isRequired,
+  setCourseType: PropTypes.func.isRequired,
+  courseName: PropTypes.string.isRequired,
+  setCourseName: PropTypes.func.isRequired,
+  setCourseData: PropTypes.func.isRequired,
+  courseData: PropTypes.object,
+  handleNext: PropTypes.func.isRequired,
 };
 
 export default CourseForm;

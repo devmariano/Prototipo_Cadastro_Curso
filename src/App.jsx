@@ -1,16 +1,12 @@
 //import React from 'react';
-import { Container, Typography } from '@mui/material';
-import CourseForm from './components/CourseForm';
+import CourseStepperForm from './components/CourseStepperForm';
 
-function App() {
+const App = () => {
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h4" align="center" gutterBottom>
-        Cadastro de Cursos
-      </Typography>
-      <CourseForm />
-    </Container>
+    <div>
+      <CourseStepperForm />
+    </div>
   );
-}
+};
 
 export default App;
